@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Geometric Circle Layout</title>
+    <link rel="stylesheet" type='text/css' href="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/devicon.min.css" />
+    <style>
+        :root {
+            --bg-deep: #030105;
+            --bg-grid: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 104' width='240' height='208'%3E%3Cg fill='none' stroke='%23180824' stroke-width='0.4'%3E%3Cline x1='0' y1='0' x2='120' y2='0'/%3E%3Cline x1='0' y1='52' x2='120' y2='52'/%3E%3Cline x1='0' y1='104' x2='120' y2='104'/%3E%3Cline x1='0' y1='0' x2='30' y2='52'/%3E%3Cline x1='60' y1='0' x2='30' y2='52'/%3E%3Cline x1='60' y1='0' x2='90' y2='52'/%3E%3Cline x1='120' y1='0' x2='90' y2='52'/%3E%3Cline x1='0' y1='104' x2='30' y2='52'/%3E%3Cline x1='60' y1='104' x2='30' y2='52'/%3E%3Cline x1='60' y1='104' x2='90' y2='52'/%3E%3Cline x1='120' y1='104' x2='90' y2='52'/%3E%3Cpath d='M8.65,5 L51.35,5 L30,42 Z'/%3E%3Cpath d='M17.3,10 L42.7,10 L30,32 Z'/%3E%3Cpath d='M25.95,15 L34.05,15 L30,22 Z'/%3E%3Cpath d='M68.65,5 L111.35,5 L90,42 Z'/%3E%3Cpath d='M77.3,10 L102.7,10 L90,32 Z'/%3E%3Cpath d='M85.95,15 L94.05,15 L90,22 Z'/%3E%3Cpath d='M38.65,47 L81.35,47 L60,10 Z'/%3E%3Cpath d='M47.3,42 L72.7,42 L60,20 Z'/%3E%3Cpath d='M55.95,37 L64.05,37 L60,30 Z'/%3E%3Cpath d='M8.65,99 L51.35,99 L30,62 Z'/%3E%3Cpath d='M17.3,94 L42.7,94 L30,72 Z'/%3E%3Cpath d='M25.95,89 L34.05,89 L30,82 Z'/%3E%3Cpath d='M68.65,99 L111.35,99 L90,62 Z'/%3E%3Cpath d='M77.3,94 L102.7,94 L90,72 Z'/%3E%3Cpath d='M85.95,89 L94.05,89 L90,82 Z'/%3E%3Cpath d='M38.65,57 L81.35,57 L60,94 Z'/%3E%3Cpath d='M47.3,62 L72.7,62 L60,84 Z'/%3E%3Cpath d='M55.95,67 L64.05,67 L60,74 Z'/%3E%3Cpath d='M0,10 L21.35,47 L0,47'/%3E%3Cpath d='M0,20 L12.7,42 L0,42'/%3E%3Cpath d='M0,30 L4.05,37 L0,37'/%3E%3Cpath d='M120,10 L98.65,47 L120,47'/%3E%3Cpath d='M120,20 L107.3,42 L120,42'/%3E%3Cpath d='M120,30 L115.95,37 L120,37'/%3E%3Cpath d='M0,57 L21.35,57 L0,94'/%3E%3Cpath d='M0,62 L12.7,62 L0,84'/%3E%3Cpath d='M0,67 L4.05,67 L0,74'/%3E%3Cpath d='M98.65,57 L120,57 M120,94 L98.65,57'/%3E%3Cpath d='M107.3,62 L120,62 M120,84 L107.3,62'/%3E%3Cpath d='M115.95,67 L120,67 M120,74 L115.95,67'/%3E%3C/g%3E%3C/svg%3E");
+            --card-border: #444444;
+            --text-color: #ffffff;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            cursor: crosshair;
+        }
+
+        body {
+            background-color: var(--bg-deep);
+            background-image: var(--bg-grid);
+            color: var(--text-color);
+            width: 100vw;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+            overflow-y: auto;
+            opacity: 0;
+            animation: fadeIn 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            padding: 90px 20px 40px 20px;
+        }
+
+        @keyframes fadeIn {
+            to {
+                opacity: 1;
+            }
+        }
+
+        /* Top Song Info & Control Bar */
+        .song-banner {
+            position: absolute;
+            top: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            z-index: 10;
+        }
+
+        .song-info-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .song-thumb {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: none;
+            display: block;
+        }
+
+        .song-title {
+            font-family: monospace;
+            font-size: 0.85rem;
+            color: #ffffff;
+            letter-spacing: 0.5px;
+            white-space: nowrap;
+            max-width: 280px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .audio-controls {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-left: 10px;
+        }
+
+        .control-btn {
+            background: none;
+            border: none;
+            width: 24px;
+            height: 24px;
+            fill: #ffffff;
+            cursor: pointer;
+            transition: transform 0.2s ease, fill 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Hover animations strictly for control buttons */
+        .control-btn:hover {
+            fill: #cccccc;
+            transform: scale(1.15);
+        }
+
+        .control-btn svg {
+            width: 100%;
+            height: 100%;
+        }
+
+        /* Volume Control Wrapper */
+        .volume-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            position: relative;
+        }
+
+        .volume-slider {
+            width: 60px;
+            height: 4px;
+            appearance: none;
+            background: #221533;
+            border-radius: 2px;
+            outline: none;
+            cursor: pointer;
+        }
+
+        .volume-slider::-webkit-slider-thumb {
+            appearance: none;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #ffffff;
+            cursor: pointer;
+        }
+
+        /* Progress Bar Styles */
+        .progress-container {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-family: monospace;
+            font-size: 0.75rem;
+            color: #ffffff;
+        }
+
+        .progress-bar {
+            flex-grow: 1;
+            height: 4px;
+            background: #221533;
+            border-radius: 2px;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .progress-filled {
+            height: 100%;
+            background: #ffffff;
+            width: 0%;
+            pointer-events: none;
+        }
+
+        /* Profile Container with Banner Background (No hover scale/border transition) */
+        .profile-container {
+            position: relative;
+            width: 100%;
+            max-width: 480px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background: rgba(10, 5, 15, 0.85);
+            border: 1px solid var(--card-border);
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8);
+        }
+
+        /* Background Banner behind the circle frame */
+        .profile-banner {
+            width: 100%;
+            height: 140px;
+            overflow: hidden;
+            position: relative;
+            border-bottom: 1px solid var(--card-border);
+        }
+
+        .profile-banner img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+            filter: brightness(0.85);
+        }
+
+        /* Inner Content wrapper inside the profile container */
+        .profile-content {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 12px;
+            padding: 0 25px 25px 25px;
+            width: 100%;
+            margin-top: -50px;
+            z-index: 2;
+        }
+
+        .circle-frame {
+            width: 110px;
+            height: 110px;
+            border-radius: 50%;
+            border: 3px solid var(--card-border);
+            overflow: hidden;
+            background-color: #1a1a1a;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.6);
+            margin-left: 10px;
+        }
+
+        .circle-frame img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        .badge-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 2px;
+        }
+
+        /* Hover animation strictly for Tech Stack icons */
+        .badge-container i {
+            font-size: 1.25rem;
+            display: inline-block;
+            transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .badge-container i:hover {
+            transform: scale(1.15);
+        }
+
+        .social-links {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            margin-top: 2px;
+            margin-bottom: 8px;
+        }
+
+        /* Hover animation strictly for Social Link icons */
+        .social-link {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 38px;
+            height: 38px;
+            text-decoration: none;
+            transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .social-link:hover {
+            transform: translateY(-3px) scale(1.1);
+        }
+
+        .social-link svg {
+            width: 100%;
+            height: 100%;
+        }
+
+        /* Text Content Area */
+        .text-bio-section {
+            width: 100%;
+            text-align: left;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            border-top: 1px solid #221533;
+            padding-top: 15px;
+            margin-top: 5px;
+            font-family: monospace;
+        }
+
+        .text-bio-section h1 {
+            font-size: 1.15rem;
+            color: #ffffff;
+            letter-spacing: 0.5px;
+        }
+
+        .text-bio-section h2 {
+            font-size: 0.95rem;
+            color: #cccccc;
+            letter-spacing: 0.5px;
+        }
+
+        .text-bio-section p {
+            font-size: 0.85rem;
+            color: #aaaaaa;
+            line-height: 1.6;
+        }
+
+        #audio-container {
+            position: absolute;
+            width: 0;
+            height: 0;
+            overflow: hidden;
+            opacity: 0;
+            pointer-events: none;
+        }
+    </style>
+    <script>
+        document.addEventListener('keydown', function(e) {
+            if (
+                e.key === 'F12' || 
+                (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'J' || e.key === 'C')) || 
+                (e.ctrlKey && e.key === 'U')
+            ) {
+                e.preventDefault();
+                return false;
+            }
+        });
+
+        document.addEventListener('contextmenu', function(e) {
+            e.preventDefault();
+        });
+
+        const videoId = "p5w71XZQyNM";
+        let player;
+        let isPlaying = false;
+        let isMuted = false;
+        let lastVolume = 80;
+        let progressInterval;
+
+        function onYouTubeIframeAPIReady() {
+            player = new YT.Player('yt-player', {
+                events: {
+                    'onReady': function(event) {
+                        event.target.cueVideoById(videoId);
+                        event.target.setVolume(lastVolume);
+                        startProgressTracker();
+                    },
+                    'onStateChange': onPlayerStateChange
+                }
+            });
+        }
+
+        function onPlayerStateChange(event) {
+            if (event.data === YT.PlayerState.ENDED) {
+                player.playVideo();
+            }
+        }
+
+        const tag = document.createElement('script');
+        tag.src = "https://www.youtube.com/iframe_api";
+        const firstScriptTag = document.getElementsByTagName('script')[0];
+        firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+
+        function togglePlayPause() {
+            if (!player) return;
+            const playIconPath = document.getElementById('play-icon-path');
+            if (isPlaying) {
+                player.pauseVideo();
+                playIconPath.setAttribute('d', 'M8 5v14l11-7z'); // Play icon
+                isPlaying = false;
+            } else {
+                player.playVideo();
+                playIconPath.setAttribute('d', 'M6 19h4V5H6v14zm8-14v14h4V5h-4z'); // Pause icon
+                isPlaying = true;
+            }
+        }
+
+        function toggleMute() {
+            if (!player) return;
+            const muteIconPath = document.getElementById('mute-icon-path');
+            const volumeSlider = document.getElementById('volume-slider');
+
+            if (isMuted) {
+                player.unMute();
+                player.setVolume(lastVolume);
+                volumeSlider.value = lastVolume;
+                muteIconPath.setAttribute('d', 'M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02z'); // Sound icon
+                isMuted = false;
+            } else {
+                lastVolume = player.getVolume();
+                player.mute();
+                volumeSlider.value = 0;
+                muteIconPath.setAttribute('d', 'M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z'); // Mute icon
+                isMuted = true;
+            }
+        }
+
+        function changeVolume(e) {
+            if (!player || !player.setVolume) return;
+            const val = e.target.value;
+            lastVolume = val;
+            player.setVolume(val);
+            const muteIconPath = document.getElementById('mute-icon-path');
+            if (val == 0) {
+                player.mute();
+                isMuted = true;
+                muteIconPath.setAttribute('d', 'M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z');
+            } else {
+                if (isMuted) {
+                    player.unMute();
+                    isMuted = false;
+                }
+                muteIconPath.setAttribute('d', 'M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02z');
+            }
+        }
+
+        function rewindFive() {
+            if (!player) return;
+            let currentTime = player.getCurrentTime();
+            player.seekTo(Math.max(0, currentTime - 5), true);
+        }
+
+        function formatTime(seconds) {
+            if (isNaN(seconds)) return "0:00";
+            let mins = Math.floor(seconds / 60);
+            let secs = Math.floor(seconds % 60);
+            return mins + ":" + (secs < 10 ? "0" : "") + secs;
+        }
+
+        function startProgressTracker() {
+            const filledBar = document.getElementById('progress-filled');
+            const currentTimeEl = document.getElementById('current-time');
+            const totalDurationEl = document.getElementById('total-duration');
+
+            progressInterval = setInterval(() => {
+                if (player && player.getCurrentTime && player.getDuration) {
+                    let current = player.getCurrentTime();
+                    let duration = player.getDuration();
+                    
+                    if (duration > 0) {
+                        let percent = (current / duration) * 100;
+                        filledBar.style.width = percent + '%';
+                        currentTimeEl.textContent = formatTime(current);
+                        totalDurationEl.textContent = formatTime(duration);
+                    }
+                }
+            }, 500);
+        }
+
+        function seekAudio(e) {
+            if (!player || !player.getDuration) return;
+            const progressBar = document.getElementById('progress-bar');
+            const rect = progressBar.getBoundingClientRect();
+            const clickX = e.clientX - rect.left;
+            const width = rect.width;
+            const duration = player.getDuration();
+            
+            const newTime = (clickX / width) * duration;
+            player.seekTo(newTime, true);
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            fetch(`https://www.youtube.com/oembed?url=https://www.youtube.com/watch?v=${videoId}&format=json`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data && data.title) {
+                        document.querySelector('.song-title').textContent = data.title;
+                    }
+                })
+                .catch(() => {});
+        });
+    </script>
+</head>
+<body>
+    <div class="song-banner">
+        <div class="song-info-row">
+            <img class="song-thumb" src="https://i.ytimg.com/vi/p5w71XZQyNM/hqdefault.jpg" alt="Song Cover">
+            <span class="song-title">Loading Track...</span>
+            <div class="audio-controls">
+                <button class="control-btn" onclick="rewindFive()" title="Rewind 5 Seconds" aria-label="Rewind 5 Seconds">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M12.5 8c-2.65 0-5.05.99-6.9 2.6L2 7v9h9l-3.62-3.62c1.39-1.16 3.16-1.88 5.12-1.88 3.54 0 6.55 2.31 7.6 5.5l2.37-.78C20.08 11.03 16.65 8 12.5 8z"/>
+                        <text x="8.5" y="15" font-size="6" fill="#ffffff" font-family="monospace">5</text>
+                    </svg>
+                </button>
+                <button class="control-btn" id="play-pause-btn" onclick="togglePlayPause()" title="Play/Pause" aria-label="Play/Pause">
+                    <svg viewBox="0 0 24 24">
+                        <path id="play-icon-path" d="M8 5v14l11-7z"/>
+                    </svg>
+                </button>
+                <button class="control-btn" id="mute-btn" onclick="toggleMute()" title="Mute/Unmute" aria-label="Mute/Unmute">
+                    <svg viewBox="0 0 24 24">
+                        <path id="mute-icon-path" d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02z"/>
+                    </svg>
+                </button>
+                <div class="volume-wrapper" title="Volume Control">
+                    <input type="range" id="volume-slider" class="volume-slider" min="0" max="100" value="80" oninput="changeVolume(event)">
+                </div>
+            </div>
+        </div>
+        <div class="progress-container">
+            <span id="current-time">0:00</span>
+            <div class="progress-bar" id="progress-bar" onclick="seekAudio(event)">
+                <div class="progress-filled" id="progress-filled"></div>
+            </div>
+            <span id="total-duration">0:00</span>
+        </div>
+    </div>
+
+    <div class="profile-container">
+        <div class="profile-banner">
+            <img src="https://i.pinimg.com/736x/7f/ce/bd/7fcebd09da3186b0d2aa59fdf25589b4.jpg" alt="Profile Banner">
+        </div>
+        
+        <div class="profile-content">
+            <div class="circle-frame">
+                <img src="https://i.pinimg.com/736x/57/1a/cc/571acc8ddc34414fdb8f9bbf9a0e1774.jpg" alt="Framed Image">
+            </div>
+
+            <div class="badge-container">
+                <i class="devicon-html5-plain colored"></i>
+                <i class="devicon-css3-plain colored"></i>
+            </div>
+            
+            <div class="social-links">
+                <a href="https://github.com/everwow1" target="_blank" rel="noopener noreferrer" class="social-link" aria-label="GitHub Profile">
+                    <svg viewBox="0 0 24 24" fill="#ffffff">
+                        <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/>
+                    </svg>
+                </a>
+
+                <a href="https://www.youtube.com/@imeverwow" target="_blank" rel="noopener noreferrer" class="social-link" aria-label="YouTube Channel">
+                    <svg viewBox="0 0 24 24" fill="#FF0000">
+                        <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
+                    </svg>
+                </a>
+
+                <a href="https://open.spotify.com/user/315zft65i2slcdkala7pazzop534" target="_blank" rel="noopener noreferrer" class="social-link" aria-label="Spotify Profile">
+                    <svg viewBox="0 0 24 24" fill="#1DB954">
+                        <path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.6 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.42.12-.84-.12-.96-.54-.12-.42.12-.84.54-.96 4.56-1.02 8.52-.6 11.76 1.44.36.24.48.72.24 1.02zm1.44-3.84c-.3.48-.9.66-1.38.36-3.24-1.98-8.1-2.58-11.88-1.41-.54.18-1.14-.12-1.32-.66-.18-.54.12-1.14.66-1.32 4.2-1.26 9.6-.6 13.38 1.68.48.3.66.9.36 1.35zm.12-4.02C15.24 7.26 8.82 7.02 5.16 8.16c-.66.2-1.38-.18-1.56-.84-.2-.66.18-1.38.84-1.56 4.38-1.32 11.52-1.02 16.02 1.62.6.36.78 1.14.42 1.74-.36.54-1.14.72-1.74.36z"/>
+                    </svg>
+                </a>
+            </div>
+
+            <div class="text-bio-section">
+                <h1>Hi I am everwow</h1>
+                <h2>About Me</h2>
+                <p>I am a 15 year old Coder I like to listen to music I like anime I like to code in my free time
+                -i am working on a project called Clover gonna be a unblocked games site</p>
+            </div>
+        </div>
+    </div>
+
+    <div id="audio-container">
+        <iframe id="yt-player" src="https://www.youtube.com/embed/p5w71XZQyNM?enablejsapi=1" allow="autoplay"></iframe>
+    </div>
+</body>
+</html>
